@@ -92,12 +92,49 @@ public:
         cout << "Data stored successfully!\n";
     }
 
-    void userLogin()
+    bool userLogin()
     {
+        // Asking for user data
         cout << "Please input your username: ";
-        cin >> userName;
+        getline(cin, userName);
 
         cout << "Please input your password: ";
-        cin >> password;
-    }
+        getline(cin, password);
+
+        ifstream readFile("user data.txt");
+
+        if (!readFile.is_open())
+        {
+            cout << "Error to open file!\n";
+            return false;
+        }
+
+        string fileLine, storedUsername, storedPassword;
+        while (getline(readFile, fileLine))
+        {
+            if (fileLine.find("Username:") != string::npos)
+            {
+                storedUsername = fileLine.substr(fileLine.find(":") + 2);
+
+                // Read next line to find password
+                getline(readFile, fileLine);
+                if (fileLine.find("Password:") != string::npos)
+                {
+                    storedPassword = fileLine.substr(fileLine.find(":") + 2);
+
+                    // Check credentials
+                    if (storedUsername == userName && storedPassword == password)
+                    {
+                        readFile.close();
+                        cout << "Congrats Login Successfully!\n";
+                        return true;
+                    }
+                }
+            }
+        }
+        // incase wrong username or password
+        readFile.close();
+        cout << "Unable to Login. Invalid Username or Password.\n";
+        return false;
+    };
 };
